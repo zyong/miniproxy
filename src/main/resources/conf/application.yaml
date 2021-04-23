@@ -1,0 +1,11 @@
+Server:
+  port:
+    8080
+
+Handlers:
+  [
+    "io.netty.handler.codec.http.HttpServerCodec",
+    "netty.handler.HttpHandler"
+  ]
+
+
