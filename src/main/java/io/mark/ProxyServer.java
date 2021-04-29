@@ -1,6 +1,8 @@
 package io.mark;
 
+import io.mark.handler.HttpHandler;
 import io.mark.handler.ProxyHttpHandler;
+import io.mark.monitor.GlobalTrafficMonitor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -10,6 +12,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -50,13 +54,14 @@ public class ProxyServer {
                 channel = NioServerSocketChannel.class;
 
             b.group(bossGroup, workerGroup).channel((Class<? extends ServerChannel>) channel)
-                    .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
+                            p.addLast(GlobalTrafficMonitor.getInstance());
                             p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                            p.addLast(new ProxyHttpHandler());
+//                            p.addLast(new ProxyHttpHandler());
+                            p.addLast("httphandler", new HttpHandler());
                         }
                     });
 
