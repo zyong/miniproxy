@@ -6,10 +6,7 @@ import io.mark.monitor.GlobalTrafficMonitor;
 import io.mark.util.HttpClientHeader;
 import io.mark.util.SocksServerUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;

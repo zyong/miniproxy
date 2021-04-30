@@ -36,7 +36,15 @@ public class HttpClientHeader {
     }
 
     public String uri() {
-        return url;
+        if (url.contains("http")) {
+            return url;
+        } else {
+            if (https)
+                return "https://"  + url;
+            else {
+                return "http://" + host + url;
+            }
+        }
     }
 
     public String getPath() {
@@ -94,18 +102,11 @@ public class HttpClientHeader {
             if (method == null) {
                 method = line.split(" ")[0]; // the first word is http method name
                 https = method.equalsIgnoreCase("CONNECT"); // method CONNECT means https
+
                 url = line.split(" ")[1];
 
-                if (!url.startsWith("http")) {
-                    url = "http://" + url;
-                }
-
                 String[] paths = url.split("/", 4);
-                if (paths.length > 3) {
-                    path = "/" + paths[3];
-                } else {
-                    path = "/" + paths[paths.length - 1];
-                }
+                path = "/" + paths[paths.length - 1];
             }
 
             if (line.startsWith("Host: ")) {
