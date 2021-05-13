@@ -1,7 +1,8 @@
 package io.mark;
 
+import io.mark.enums.ProxyMode;
 import io.mark.handler.HttpHandler;
-import io.mark.handler.ProxyHttpHandler;
+import io.mark.handler.SocksServerInitializer;
 import io.mark.monitor.GlobalTrafficMonitor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -12,28 +13,90 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import org.apache.commons.cli.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ProxyServer {
+    private final Logger logger = LoggerFactory.getLogger(ProxyServer.class);
+
+    private ProxyServerConfig config = null;
+
+    public ProxyServer(ProxyServerConfig config) {
+        this.config = config;
+    }
 
     public static void main(String[] args) throws Exception {
+        CommandLineParser parser = new DefaultParser();
 
-        Config configs = new Config();
+        Options options = new Options();
 
-        int port = (int)configs.get("Server/port");
+        options.addOption(
+                Option.builder("m")
+                        .longOpt("mode")
+                        .hasArg()
+                        .argName("MODE")
+                        .desc("proxy mode(HTTP(s), SOCKS), default: HTTP(s)")
+                        .build());
+        options.addOption(
+                Option.builder("h")
+                        .longOpt("host")
+                        .hasArg()
+                        .argName("HOST")
+                        .desc("listening host, default: 127.0.0.1")
+                        .build());
+        options.addOption(
+                Option.builder("p")
+                        .longOpt("port")
+                        .hasArg()
+                        .argName("PORT")
+                        .desc("listening port, default: 8080")
+                        .build());
+
+        CommandLine commandLine = null;
+        try {
+            commandLine = parser.parse(options, args);
+        } catch (ParseException e) {
+            new HelpFormatter().printHelp("miniproxy", options, true);
+            System.exit(-1);
+        }
+
+        new ProxyServer(ProxyServer.parse(commandLine)).run();
+    }
+
+    private static ProxyServerConfig parse(CommandLine commandLine) {
+        ProxyServerConfig config = new ProxyServerConfig();
+        if (commandLine.hasOption("m")) {
+            config.setProxyMode(ProxyMode.of(commandLine.getOptionValue("m")));
+        }
+        if (commandLine.hasOption("h")) {
+            config.setHost(commandLine.getOptionValue("h"));
+        }
+        if (commandLine.hasOption("p")) {
+            try {
+                config.setPort(Integer.parseInt(commandLine.getOptionValue("p")));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Not a legal port: " + commandLine.getOptionValue("p"));
+            }
+        }
+
+        LoggerFactory.getLogger(ProxyServer.class).info("{}", config);
+        return config;
+    }
+
+    public void run() throws Exception {
         EventLoopGroup bossGroup;
         EventLoopGroup workerGroup;
 
         if (Epoll.isAvailable()) {
-            bossGroup = new EpollEventLoopGroup(2);
-            workerGroup = new EpollEventLoopGroup(16);
+            bossGroup = new EpollEventLoopGroup(1);
+            workerGroup = new EpollEventLoopGroup();
         } else {
-            bossGroup = new NioEventLoopGroup(2);
-            workerGroup = new NioEventLoopGroup(16);
+            bossGroup = new NioEventLoopGroup(1);
+            workerGroup = new NioEventLoopGroup();
         }
 
         try {
@@ -41,7 +104,6 @@ public class ProxyServer {
 //            backlog 支持的半连接状态的数量
             b.option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.TCP_NODELAY, true)
-//                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.SO_REUSEADDR, true)
                     .childOption(ChannelOption.SO_RCVBUF, 32 * 1024)
                     .childOption(ChannelOption.SO_SNDBUF, 32 * 1024)
@@ -53,19 +115,23 @@ public class ProxyServer {
             } else
                 channel = NioServerSocketChannel.class;
 
-            b.group(bossGroup, workerGroup).channel((Class<? extends ServerChannel>) channel)
-                    .childHandler(new ChannelInitializer<Channel>() {
-                        @Override
-                        protected void initChannel(Channel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
-                            p.addLast(GlobalTrafficMonitor.getInstance());
-                            p.addLast(new LoggingHandler(LogLevel.DEBUG));
-//                            p.addLast(new ProxyHttpHandler());
-                            p.addLast("httphandler", new HttpHandler());
-                        }
-                    });
+            b.group(bossGroup, workerGroup).channel((Class<? extends ServerChannel>) channel);
 
-            Channel ch = b.bind(port).sync().channel();
+            if (config.mode == ProxyMode.HTTP) {
+                b.childHandler(new ChannelInitializer<Channel>() {
+                    @Override
+                    protected void initChannel(Channel ch) throws Exception {
+                        ChannelPipeline p = ch.pipeline();
+                        p.addLast(GlobalTrafficMonitor.getInstance());
+                        p.addLast(new LoggingHandler(LogLevel.DEBUG));
+                        p.addLast("httphandler", new HttpHandler());
+                    }
+                });
+            } else if (config.mode == ProxyMode.SOCKS) {
+                b.childHandler(new SocksServerInitializer());
+            }
+
+            Channel ch = b.bind(config.getPort()).sync().channel();
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

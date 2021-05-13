@@ -1,13 +1,10 @@
 package io.mark.handler;
 
 import io.mark.util.HttpClientHeader;
-import io.mark.web.Dispatcher;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
-import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +24,6 @@ public class ProxyHttpHandler extends ChannelInboundHandlerAdapter {
     /*解析真实客户端的header*/
     private final HttpClientHeader header = new HttpClientHeader();
 
-//    public void channelActive(ChannelHandlerContext ctx) {
-//        clientChannel = ctx.channel();
-//    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws MalformedURLException, URISyntaxException {
