@@ -1,4 +1,4 @@
-package io.mark.handler;
+package io.mark.handler.socks;
 
 
 import io.netty.channel.Channel;

@@ -1,9 +1,5 @@
 package io.mark;
 
-import io.mark.enums.ProxyMode;
-import io.mark.handler.HttpHandler;
-import io.mark.handler.SocksServerInitializer;
-import io.mark.monitor.GlobalTrafficMonitor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -18,6 +14,11 @@ import io.netty.handler.logging.LoggingHandler;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.mark.enums.ProxyMode;
+import io.mark.handler.HttpHandler;
+import io.mark.handler.socks.SocksServerInitializer;
+import io.mark.monitor.GlobalTrafficMonitor;
 
 
 public class ProxyServer {

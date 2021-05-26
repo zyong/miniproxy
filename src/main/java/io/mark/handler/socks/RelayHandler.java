@@ -1,4 +1,4 @@
-package io.mark.handler;
+package io.mark.handler.socks;
 
 import io.mark.util.SocksServerUtils;
 import io.netty.buffer.Unpooled;

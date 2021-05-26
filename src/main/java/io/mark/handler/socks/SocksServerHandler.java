@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package io.mark.handler;
+package io.mark.handler.socks;
 
 import io.mark.util.SocksServerUtils;
 import io.netty.channel.ChannelHandler;
