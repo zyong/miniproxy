@@ -18,7 +18,7 @@ public class ProxyServerConfig {
     boolean insecure;
 
     public ProxyServerConfig () {
-        mode = ProxyMode.SOCKS;
+        mode = ProxyMode.HTTP;
         host = "127.0.0.1";
         port = 8080;
 
