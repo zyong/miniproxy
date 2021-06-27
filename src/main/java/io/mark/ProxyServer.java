@@ -22,7 +22,7 @@ import io.mark.monitor.GlobalTrafficMonitor;
 
 
 public class ProxyServer {
-    private final Logger logger = LoggerFactory.getLogger(ProxyServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServer.class);
 
     private ProxyServerConfig config = null;
 
@@ -84,7 +84,7 @@ public class ProxyServer {
             }
         }
 
-        LoggerFactory.getLogger(ProxyServer.class).info("{}", config);
+        LOGGER.info("{}", config);
         return config;
     }
 
