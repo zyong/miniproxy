@@ -2,7 +2,7 @@
 - A Http(s) Proxy using a very simple way based on Netty. It supplies
 multi protocol proxy abilities.
 
-## Start miniproxy
+## 程序启动
 ```
 ./miniproxy.sh -h
 usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
@@ -10,30 +10,28 @@ usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
  -m,--mode <MODE>   proxy mode(HTTP(s), SOCKS), default: HTTP(s)
  -p,--port <PORT>   listening port, default: 8080
 ```
-## Features
 
-### Support Proxy
-- HTTP Proxy
-- HTTP Proxy (Tunnel)
+
+### 支持的代理
+- HTTP(s) Proxy (Tunnel)
 - Socks Proxy
 
-### Support Protocol
+### 支持协议
 - HTTP/1
 - HTTP/2
-- TLS
+- TLS(不需要加密密钥)
 - Socks
 
-### Support Functionality
-- Display network traffic
+### 网速监控
+- 网络流量展示
+  http(s)://host:port/net 提供了基于echarts.js的网速监控
+  
+- 支持监控数据产出
+  http(s)://host:port/metrics提供了prometheus的数据产出
 
-
-##### TODO：
-1. ~~HTTP(S)代理~~
-2. ~~数据统计功能~~
-3. ~~数据统计Web端~~
-4. ~~Socks代理~~
-5. ~~HTTP2代理~~
-
+### 支持客户端
+- 支持socks的客户端都可以，例如：ShadownSocks
+- Chrome浏览器支持SwitchySharp插件使用，其他插件应该也可以
 
 
 
