@@ -13,18 +13,11 @@ public class ProxyServerConfig {
     ProxyMode mode;
     String host;
     int port;
-    String certFile;
-    String certKey;
-    boolean insecure;
 
     public ProxyServerConfig () {
         mode = ProxyMode.HTTP;
         host = "127.0.0.1";
         port = 8080;
-
-        certFile = "server.pem";
-        certKey = "key.pem";
-        insecure = true;
 
     }
 
@@ -40,18 +33,6 @@ public class ProxyServerConfig {
         port = p;
     }
 
-    public void setCertFile(String certFile) {
-        this.certFile = certFile;
-    }
-
-    public void setKeyFile(String certKey) {
-        this.certKey = certKey;
-    }
-
-    public void setInsecure(boolean b) {
-        insecure = b;
-    }
-
     public int getPort() {
         return port;
     }
@@ -61,10 +42,7 @@ public class ProxyServerConfig {
         List<String> properties = asList(
                 format("proxyMode=%s", mode),
                 format("host=%s", host),
-                format("port=%s", port),
-                format("certFile=%s", certFile),
-                format("certkey=%s", certKey),
-                format("insecure=%b", insecure));
+                format("port=%s", port));
         return format("ProxyServerConfig%n%s", Joiner.on(lineSeparator()).join(properties));
     }
 }
