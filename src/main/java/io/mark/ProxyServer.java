@@ -125,7 +125,7 @@ public class ProxyServer {
                         ChannelPipeline p = ch.pipeline();
                         p.addLast(GlobalTrafficMonitor.getInstance());
                         p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                        p.addLast("httphandler", new HttpHandler());
+                        p.addLast("httphandler", new HttpHandler(config));
                     }
                 });
             } else if (config.mode == ProxyMode.SOCKS) {

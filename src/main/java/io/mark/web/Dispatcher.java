@@ -27,7 +27,7 @@ import static io.netty.handler.codec.http.HttpHeaderValues.CLOSE;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 
 public class Dispatcher {
-    private static final Logger log = LoggerFactory.getLogger("web");
+    private static final Logger log = LoggerFactory.getLogger("Dispatcher");
     private static byte[] favicon = new byte[0];
     private static final MonitorService MONITOR_SERVICE = MonitorService.getInstance();
 

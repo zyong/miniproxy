@@ -15,14 +15,12 @@ public class Render {
         StringTemplateResolver textResolver = new StringTemplateResolver();
         textResolver.setOrder(1);
         textResolver.setTemplateMode(TemplateMode.TEXT);
-        // TODO Cacheable or Not ?
         textResolver.setCacheable(true);
         textEngine.setTemplateResolver(textResolver);
 
         StringTemplateResolver templateResolver = new StringTemplateResolver();
         templateResolver.setOrder(1);
         templateResolver.setTemplateMode(TemplateMode.HTML);
-        // TODO Cacheable or Not ?
         templateResolver.setCacheable(true);
         htmlEngine.setTemplateResolver(templateResolver);
     }

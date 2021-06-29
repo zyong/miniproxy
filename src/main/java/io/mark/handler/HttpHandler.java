@@ -1,6 +1,8 @@
 package io.mark.handler;
 
+import io.mark.ProxyServerConfig;
 import io.mark.util.HttpClientHeader;
+import io.mark.util.IpInner;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -12,6 +14,12 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
     private final HttpClientHeader header = new HttpClientHeader();
+
+    private final ProxyServerConfig config;
+
+    public HttpHandler(ProxyServerConfig config) {
+        this.config = config;
+    }
 
 
     @Override
@@ -26,7 +34,10 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
         }
 
         // 如果不是proxy请求
-        if (header.getHost().equalsIgnoreCase("127.0.0.1") || header.getHost().equalsIgnoreCase("locahost") ) {
+        if (IpInner.isInnerIp(header.getHost()) ||
+                header.getHost().equalsIgnoreCase(config.getHost()) ||
+                header.getHost().equalsIgnoreCase("localhost")
+        ) {
             ChannelPipeline pipeline = ctx.pipeline();
             pipeline.addLast("encode", new HttpResponseEncoder());
             pipeline.addLast("statics", new StaticsHandler());

@@ -29,6 +29,10 @@ public class ProxyServerConfig {
         host = h;
     }
 
+    public String getHost() {
+        return host;
+    }
+
     public void setPort(int p) {
         port = p;
     }

@@ -15,6 +15,4 @@ public final class SocksServerUtils {
             ch.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
         }
     }
-
-    private SocksServerUtils() { }
 }
