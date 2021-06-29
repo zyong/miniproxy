@@ -29,6 +29,8 @@ usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
 - 支持监控数据产出
   http(s)://host:port/metrics提供了prometheus的数据产出
 
+![Alt text](https://gitee.com/gosimple/miniproxy/blob/main/ScreenShot1.png)
+
 ### 支持客户端
 - 支持socks的客户端都可以，例如：ShadownSocks
 - Chrome浏览器支持SwitchySharp插件使用，其他插件应该也可以
