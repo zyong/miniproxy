@@ -19,12 +19,17 @@ import io.mark.enums.ProxyMode;
 import io.mark.handler.HttpHandler;
 import io.mark.handler.socks.SocksServerInitializer;
 import io.mark.monitor.GlobalTrafficMonitor;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 
 public class ProxyServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServer.class);
 
     private ProxyServerConfig config = null;
+
+    private NioEventLoopGroup bossGroup;
+    private NioEventLoopGroup workerGroup;
 
     public ProxyServer(ProxyServerConfig config) {
         this.config = config;
@@ -88,17 +93,23 @@ public class ProxyServer {
         return config;
     }
 
-    public void run() throws Exception {
-        EventLoopGroup bossGroup;
-        EventLoopGroup workerGroup;
+    private void stop() {
+        System.out.println("Stopping Server...");
 
-        if (Epoll.isAvailable()) {
-            bossGroup = new EpollEventLoopGroup(1);
-            workerGroup = new EpollEventLoopGroup();
-        } else {
-            bossGroup = new NioEventLoopGroup(1);
-            workerGroup = new NioEventLoopGroup();
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
         }
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+        }
+    }
+
+    public void run() throws Exception {
+        // 提前设置Terminate过程
+        Signal.handle(new Signal("INT"), signal -> stop());
+
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
 
         try {
             ServerBootstrap b = new ServerBootstrap();
@@ -109,12 +120,7 @@ public class ProxyServer {
                     .childOption(ChannelOption.SO_RCVBUF, 32 * 1024)
                     .childOption(ChannelOption.SO_SNDBUF, 32 * 1024)
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-            Class<?> channel = null;
-            if (Epoll.isAvailable()) {
-                b.option(EpollChannelOption.SO_REUSEPORT, true);
-                channel = EpollServerSocketChannel.class;
-            } else
-                channel = NioServerSocketChannel.class;
+            Class<?> channel = NioServerSocketChannel.class;
 
             b.group(bossGroup, workerGroup).channel((Class<? extends ServerChannel>) channel);
 
