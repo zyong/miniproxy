@@ -22,6 +22,8 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
     // 统计数据存取次数
     private static final int seconds = 500;
 
+    private static String template;
+
     //
     private static List<String> xScales = new ArrayList<>();
     private static List<Double> yScalesUp = new LinkedList<>();
@@ -113,5 +115,4 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
         return Render.html(template, params);
     }
 
-    private static String template;
 }
