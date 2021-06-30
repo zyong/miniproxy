@@ -29,7 +29,7 @@ usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
 - 支持监控数据产出
   http(s)://host:port/metrics提供了prometheus的数据产出
 
-![Prometheus流入流量监控](gitee.com/gosimple/miniproxy/blob/main/ScreenShot1.png)
+![Prometheus流入流量监控](https://gitee.com/gosimple/miniproxy/blob/main/ScreenShot1.png "流量监控")
 
 ### 支持客户端
 - 支持socks的客户端都可以，例如：ShadownSocks
