@@ -11,9 +11,11 @@ usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
  -p,--port <PORT>   listening port, default: 8080
 ```
 
-### 产品设计
+### 软件设计
 ![软件设计](https://images.gitee.com/uploads/images/2021/0701/174633_7def4ba6_9021305.jpeg "software design.jpg")
 
+### 层次结构
+![软件层次](https://images.gitee.com/uploads/images/2021/0701/174840_87243eb2_9021305.jpeg "software layer.jpg")
 
 ### 支持的代理
 - HTTP(s) Proxy (Tunnel)
