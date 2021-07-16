@@ -1,5 +1,6 @@
 package io.mark;
 
+import io.mark.handler.ServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -30,6 +31,10 @@ public class ProxyServer {
 
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
+
+    private ChannelFuture future = null;
+    private ChannelFuture future2 = null;
+
 
     public ProxyServer(ProxyServerConfig config) {
         this.config = config;
@@ -102,11 +107,13 @@ public class ProxyServer {
         if (workerGroup != null) {
             workerGroup.shutdownGracefully();
         }
+        System.exit(0);
     }
 
     public void run() throws Exception {
         // 提前设置Terminate过程
         Signal.handle(new Signal("INT"), signal -> stop());
+        Signal.handle(new Signal("TERM"), signal -> stop());
 
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
@@ -123,26 +130,30 @@ public class ProxyServer {
             Class<?> channel = NioServerSocketChannel.class;
 
             b.group(bossGroup, workerGroup).channel((Class<? extends ServerChannel>) channel);
+            b.childHandler(new ServerInitializer(config));
+            future = b.bind(config.getPort()).sync();
+            //http服务,端口暂时写死
+            future2 = b.bind(10000).sync();
+            future.channel().closeFuture().addListener(new ChannelFutureListener()
+            {
+                @Override public void operationComplete(ChannelFuture future) throws Exception
+                {       //通过回调只关闭自己监听的channel
+                    future.channel().close();
+                }
+            });
+            future2.channel().closeFuture().addListener(new ChannelFutureListener()
+            {
+                @Override public void operationComplete(ChannelFuture future) throws Exception
+                {
+                    future.channel().close();
+                }
+            });
 
-            if (config.mode == ProxyMode.HTTP) {
-                b.childHandler(new ChannelInitializer<Channel>() {
-                    @Override
-                    protected void initChannel(Channel ch) throws Exception {
-                        ChannelPipeline p = ch.pipeline();
-                        p.addLast(GlobalTrafficMonitor.getInstance());
-                        p.addLast(new LoggingHandler(LogLevel.DEBUG));
-                        p.addLast("httphandler", new HttpHandler(config));
-                    }
-                });
-            } else if (config.mode == ProxyMode.SOCKS) {
-                b.childHandler(new SocksServerInitializer());
-            }
-
-            Channel ch = b.bind(config.getPort()).sync().channel();
-            ch.closeFuture().sync();
+//            ch.closeFuture().sync();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
+//            stop();
         }
     }
 }

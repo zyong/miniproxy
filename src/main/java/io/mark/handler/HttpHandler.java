@@ -10,6 +10,9 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 public class HttpHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
@@ -33,11 +36,19 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
+        SocketAddress socketAddress = ctx.channel().remoteAddress();
+        logger.info("header host %s", ((InetSocketAddress) socketAddress).getAddress().getHostAddress());
+
         // 如果不是proxy请求
-        if (IpInner.isInnerIp(header.getHost()) ||
+        // 1、来自内网统计请求
+        // 2、来自本地的统计请求
+        // 3、来自对公网IP的统计请求
+        if (header.getHost().contains("119.28.46.143") ||
+                IpInner.isInnerIp(header.getHost()) ||
                 header.getHost().equalsIgnoreCase(config.getHost()) ||
                 header.getHost().equalsIgnoreCase("localhost")
         ) {
+            logger.info("into statics logic");
             ChannelPipeline pipeline = ctx.pipeline();
             pipeline.addLast("encode", new HttpResponseEncoder());
             pipeline.addLast("statics", new StaticsHandler());
