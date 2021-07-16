@@ -7,6 +7,7 @@ import io.netty.handler.traffic.GlobalTrafficShapingHandler;
 import io.netty.handler.traffic.TrafficCounter;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,8 +38,6 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
         for (int i = 1; i <= seconds; i++) {
             xScales.add(String.valueOf(i));
         }
-
-
     }
 
     private GlobalTrafficMonitor(ScheduledExecutorService executor, long checkInterval) {
@@ -105,13 +104,14 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
         String template = "";
         try {
             InputStream input = GlobalTrafficMonitor.class.getClassLoader().getResourceAsStream("templates/net.html");
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(input));
+            InputStreamReader isr = new InputStreamReader(input,
+                    StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
             String line;
             StringBuilder sb = new StringBuilder();
             try {
                 while ((line = br.readLine()) != null) {
-                    sb.append(line);
+                    sb.append(line + "\n");
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -129,30 +129,25 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
 
     private static String getDirTemplate() {
         String template = "";
+        String path = GlobalTrafficMonitor.class.getClassLoader().getResource("templates/net.html").getPath();
+        File file = new File(path);
+        Long fileLength = file.length();
+        byte[] fileContent = new byte[fileLength.intValue()];
+
         try {
-            // 加载模板
-            String path = GlobalTrafficMonitor.class.getClassLoader().getResource("templates/net.html").getPath();
-            File file = new File(path);
-            Long fileLength = file.length();
-            byte[] fileContent = new byte[fileLength.intValue()];
+            FileInputStream in = new FileInputStream(file);
+            in.read(fileContent);
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            try {
-                FileInputStream in = new FileInputStream(file);
-                in.read(fileContent);
-                in.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                template = new String(fileContent, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-
+        try {
+            template = new String(fileContent, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return template;
     }
