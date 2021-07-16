@@ -70,26 +70,12 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
     }
 
     public static final String html() {
-        // 加载模板
-        String path = GlobalTrafficMonitor.class.getClassLoader().getResource("templates/net.html").getPath();
-        File file = new File(path);
-        Long fileLength = file.length();
-        byte[] fileContent = new byte[fileLength.intValue()];
-
-        try {
-            FileInputStream in = new FileInputStream(file);
-            in.read(fileContent);
-            in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        String template = getJarTemplate();
+        if (template.isEmpty()) {
+            template = getDirTemplate();
         }
-
-        try {
-            template = new String(fileContent, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        if (template.isEmpty()) {
+            throw  new NullPointerException("template can't get");
         }
 
         String legends = JSONObject.toJSONString(Arrays.asList("上行网速", "下行网速"));
@@ -113,6 +99,62 @@ public class GlobalTrafficMonitor extends GlobalTrafficShapingHandler {
         params.put("interval", interval);
 
         return Render.html(template, params);
+    }
+
+    private static String getJarTemplate() {
+        String template = "";
+        try {
+            InputStream input = GlobalTrafficMonitor.class.getClassLoader().getResourceAsStream("templates/net.html");
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(input));
+            String line;
+            StringBuilder sb = new StringBuilder();
+            try {
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            template = sb.toString();
+
+        } catch (Exception e) {
+
+        }
+
+        return template;
+    }
+
+    private static String getDirTemplate() {
+        String template = "";
+        try {
+            // 加载模板
+            String path = GlobalTrafficMonitor.class.getClassLoader().getResource("templates/net.html").getPath();
+            File file = new File(path);
+            Long fileLength = file.length();
+            byte[] fileContent = new byte[fileLength.intValue()];
+
+            try {
+                FileInputStream in = new FileInputStream(file);
+                in.read(fileContent);
+                in.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                template = new String(fileContent, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+
+        }
+        return template;
     }
 
 }
