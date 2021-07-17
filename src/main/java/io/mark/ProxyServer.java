@@ -4,24 +4,15 @@ import io.mark.handler.ServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollChannelOption;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.ResourceLeakDetector;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.mark.enums.ProxyMode;
-import io.mark.handler.HttpHandler;
-import io.mark.handler.socks.SocksServerInitializer;
-import io.mark.monitor.GlobalTrafficMonitor;
 import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 
 public class ProxyServer {
@@ -118,6 +109,9 @@ public class ProxyServer {
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
 
+//
+        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+
         try {
             ServerBootstrap b = new ServerBootstrap();
 //            backlog 支持的半连接状态的数量
@@ -153,7 +147,6 @@ public class ProxyServer {
         } finally {
 //            bossGroup.shutdownGracefully();
 //            workerGroup.shutdownGracefully();
-//            stop();
         }
     }
 }

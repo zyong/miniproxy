@@ -9,6 +9,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.util.ReferenceCountUtil;
 
 public class StaticsHandler extends ChannelInboundHandlerAdapter {
     private final HttpClientHeader header = new HttpClientHeader();
@@ -22,6 +23,7 @@ public class StaticsHandler extends ChannelInboundHandlerAdapter {
         if (response != null) {
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
+        ReferenceCountUtil.release(msg);
     }
 
     @Override

@@ -129,6 +129,7 @@ public class HttpClientHeader {
                 break;
             }
         }
+
         logger.debug(String.valueOf(this));
         logger.debug("--------------------------------------------------------------------------------");
     }
@@ -145,6 +146,8 @@ public class HttpClientHeader {
                 return line;
             }
         }
+        //使用完就释放
+        byteBuf.release();
         return null;
     }
 

@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
             pipeline.remove("httphandler");
         }
         ctx.fireChannelRead(header.getByteBuf());
+        ReferenceCountUtil.release(msg);
 
     }
 
