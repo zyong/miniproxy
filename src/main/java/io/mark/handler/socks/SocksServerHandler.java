@@ -23,9 +23,12 @@ import io.netty.handler.codec.socksx.SocksMessage;
 import io.netty.handler.codec.socksx.v4.Socks4CommandRequest;
 import io.netty.handler.codec.socksx.v4.Socks4CommandType;
 import io.netty.handler.codec.socksx.v5.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ChannelHandler.Sharable
 public final class SocksServerHandler extends SimpleChannelInboundHandler<SocksMessage> {
+    private final Logger logger = LoggerFactory.getLogger(SocksServerHandler.class);
 
     public static final SocksServerHandler INSTANCE = new SocksServerHandler();
 
@@ -58,6 +61,7 @@ public final class SocksServerHandler extends SimpleChannelInboundHandler<SocksM
 
                 } else if (socksRequest instanceof Socks5CommandRequest) {
                     Socks5CommandRequest socks5CmdRequest = (Socks5CommandRequest) socksRequest;
+                    logger.info("socks connect dst:{}:{}", socks5CmdRequest.dstAddr(), socks5CmdRequest.dstPort());
                     if (socks5CmdRequest.type() == Socks5CommandType.CONNECT) {
                         ctx.pipeline().addLast((ChannelHandler) new SocksServerConnectHandler());
                         ctx.pipeline().remove(this);
