@@ -35,7 +35,7 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        logger.info("header {}:{}", header.getHost(), header.getPort());
+        logger.info("method {} host {}:{}", header.getMethod(), header.getHost(), header.getPort());
 
         // 如果不是proxy请求
         // 1、来自内网统计请求
