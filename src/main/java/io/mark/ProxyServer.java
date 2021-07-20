@@ -109,8 +109,8 @@ public class ProxyServer {
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
 
-//
-        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+        // 开启内存泄漏检测
+//        ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
 
         try {
             ServerBootstrap b = new ServerBootstrap();
