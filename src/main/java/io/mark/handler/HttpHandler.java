@@ -35,7 +35,7 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        logger.info("header host {}", header.getHost());
+        logger.info("header {}:{}", header.getHost(), header.getPort());
 
         // 如果不是proxy请求
         // 1、来自内网统计请求
@@ -50,13 +50,11 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
             pipeline.addLast("encode", new HttpResponseEncoder());
             pipeline.addLast("statics", new StaticsHandler());
         } else {
-            ChannelPipeline pipeline = ctx.pipeline();
-            pipeline.addLast("proxy", new ProxyHttpHandler());
-            pipeline.remove("httphandler");
+            flushAndClose(ctx.channel());
+            return;
         }
         ctx.fireChannelRead(header.getByteBuf());
         ReferenceCountUtil.release(msg);
-
     }
 
     @Override

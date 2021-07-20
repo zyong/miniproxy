@@ -41,7 +41,7 @@ public class ProxyHttpHandler extends ChannelInboundHandlerAdapter {
         }
 
         // https请求是拿不到地址的
-        logger.info("request url:" + header.uri());
+        logger.info("request {}:{}", header.uri(), header.getPort());
 
         clientChannel.config().setAutoRead(false);
 
