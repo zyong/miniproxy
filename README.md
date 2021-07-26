@@ -2,14 +2,6 @@
 - A Http(s) Proxy using a very simple way based on Netty. It supplies
 multi protocol proxy abilities.
 
-## 程序启动
-```
-./miniproxy.sh -h
-usage: miniproxy [-h <HOST>] [-m <MODE>] [-p <PORT>]
- -h,--host <HOST>   listening host, default: 127.0.0.1
- -m,--mode <MODE>   proxy mode(HTTP(s), SOCKS), default: HTTP(s)
- -p,--port <PORT>   listening port, default: 8080
-```
 
 ### 软件设计
 ![软件设计](https://images.gitee.com/uploads/images/2021/0701/174633_7def4ba6_9021305.jpeg "software design.jpg")
